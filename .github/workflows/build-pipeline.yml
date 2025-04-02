@@ -15,28 +15,40 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # Ensure all tags are fetched
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '8.x' # Use the appropriate .NET version
-        
+
     - name: Get latest tag
       id: get_latest_tag
-      run: echo "::set-output name=tag::$(git describe --tags --abbrev=0)"
+      run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+    - name: Debug latest tag
+      run: echo "Latest tag:${{ env.tag }}"
 
     - name: Increment version
       id: increment_version
       run: |
-        latest_tag=${{ steps.get_latest_tag.outputs.tag }}
-        version=$(echo $latest_tag | awk -F. '{print $1"."$2"."$3+1}')
-        echo "::set-output name=version::$version"
+        latest_tag=${{ env.tag }}
+        if [ -z "$latest_tag" ]; then
+          version="1.0.0"
+        else
+          version=$(echo $latest_tag | awk -F. '{print $1"."$2"."$3+1}')
+        fi
+        echo "version=$version" >> $GITHUB_ENV
+
+    - name: Debug incremented version
+      run: echo "Incremented version:${{ env.version }}"
 
     - name: Update version in .csproj
       run: |
-        version=${{ steps.increment_version.outputs.version }}
+        version=${{ env.version }}
         sed -i 's/<Version>.*<\/Version>/<Version>'$version'<\/Version>/' MongoNet/MongoNet/MongoNet.csproj
-        
+
     - name: Restore dependencies
       run: dotnet restore MongoNet/MongoNet.sln
 
@@ -45,7 +57,6 @@ jobs:
 
     - name: Pack
       run: dotnet pack MongoNet/MongoNet.sln --configuration Release --no-restore --output ./artifacts
-
     - name: Publish package
       env:
         MY_PAT: ${{ secrets.MONGONET_PUBLISH  }}
