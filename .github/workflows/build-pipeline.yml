@@ -26,3 +26,13 @@ jobs:
 
     - name: Build
       run: dotnet build MongoNet/MongoNet.sln --configuration Release --no-restore
+
+    - name: Pack
+      run: dotnet pack MongoNet/MongoNet.sln --configuration Release --no-restore --output ./artifacts
+
+    - name: Publish package
+      env:
+        GITHUB_TOKEN: ${{ secrets.MONGONET_PUBLISH }}
+      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.MONGONET_PUBLISH }} -s https://nuget.pkg.github.com/nawarajkhadka/index.json
+      
+      
