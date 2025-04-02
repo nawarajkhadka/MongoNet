@@ -9,7 +9,7 @@ TODO: MongoNet is a library project to facilitate normal crud operation with c# 
 # Usage
 
 Install package.
-`Install-Package MongoSharp -version [version number]`
+`Install-Package MongoSharper -version [version number]`
 
 The usage is pretty simple, Just create an object of mongonetrepo and get going with all supported methods.
 1.Create a model inheriting the DocumentBase Class
