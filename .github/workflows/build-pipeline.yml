@@ -32,7 +32,7 @@ jobs:
 
     - name: Publish package
       env:
-        GITHUB_TOKEN: ${{ secrets.MONGONET_PUBLISH }}
-      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.MONGONET_PUBLISH }} -s https://nuget.pkg.github.com/nawarajkhadka/index.json
+        MY_PAT: ${{ secrets.nk_github_publishpack  }}
+      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.nk_github_publishpack  }} -s https://nuget.pkg.github.com/nawarajkhadka/index.json
       
       
