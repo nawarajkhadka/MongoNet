@@ -20,7 +20,23 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '8.x' # Use the appropriate .NET version
+        
+    - name: Get latest tag
+      id: get_latest_tag
+      run: echo "::set-output name=tag::$(git describe --tags --abbrev=0)"
 
+    - name: Increment version
+      id: increment_version
+      run: |
+        latest_tag=${{ steps.get_latest_tag.outputs.tag }}
+        version=$(echo $latest_tag | awk -F. '{print $1"."$2"."$3+1}')
+        echo "::set-output name=version::$version"
+
+    - name: Update version in .csproj
+      run: |
+        version=${{ steps.increment_version.outputs.version }}
+        sed -i 's/<Version>.*<\/Version>/<Version>'$version'<\/Version>/' MongoNet/MongoNet/MongoNet.csproj
+        
     - name: Restore dependencies
       run: dotnet restore MongoNet/MongoNet.sln
 
