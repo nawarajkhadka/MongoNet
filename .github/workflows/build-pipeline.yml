@@ -23,12 +23,8 @@ jobs:
       with:
         dotnet-version: '8.x' # Use the appropriate .NET version
 
-    - name: Generate version based on date and build number
-      run: |
-        date=$(date +%Y%m%d)
-        build_number=${{ github.run_number }}
-        version="1.0.$date.$build_number"
-        echo "version=$version" >> $GITHUB_ENV
+    - name: Generate version
+      run: echo "version=1.0.${{ github.run_number }}" >> $GITHUB_ENV
 
     - name: Debug generated version
       run: echo "Generated version:${{ env.version }}"
