@@ -45,6 +45,11 @@ jobs:
     - name: Publish package
       env:
         MY_PAT: ${{ secrets.MONGONET_PUBLISH  }}
-      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.MONGONET_PUBLISH  }} -s https://nuget.pkg.github.com/nawarajkhadka/index.json
+      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.MONGONET_PUBLISH  }} -s https://nuget.pkg.github.com/nawarajkhadka/index.json --skip-duplicate
+
+    - name: Publish package to NuGet.org
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_PUBLISH_API_KEY }}
+      run: dotnet nuget push ./artifacts/*.nupkg -k ${{ secrets.NUGET_PUBLISH_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
       
       
