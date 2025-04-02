@@ -4,6 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>Nawaraj Khadka</Authors>
+    <Description>A generic repo for crud and search operation with mongodb in .net</Description>
+    <PackageTags>dotnet;package;mongonet;mongodb;dotnet;mongodbwithdotnet;csharpmongodb</PackageTags>
+    <PackageProjectUrl>https://github.com/nawarajkhadka/MongoNet</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
