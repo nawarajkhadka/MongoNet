@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/MongoNet/.vs/MongoNet
+/MongoNet/MongoNet/obj
+/MongoNet/MongoNet/bin/Debug/net8.0
