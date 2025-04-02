@@ -22,7 +22,7 @@ jobs:
         dotnet-version: '8.x' # Use the appropriate .NET version
 
     - name: Restore dependencies
-      run: dotnet restore MongoNet.sln
+      run: dotnet restore MongoNet/MongoNet.sln
 
     - name: Build
-      run: dotnet build MongoNet.sln --configuration Release --no-restore
+      run: dotnet build MongoNet/MongoNet.sln --configuration Release --no-restore
