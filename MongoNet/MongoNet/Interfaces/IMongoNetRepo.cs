@@ -5,6 +5,7 @@ namespace MongoNet.Interfaces
 {
     public interface IMongoNetRepo<TEntity>
     {
+        //interfaces
         Task Create(TEntity document);
         Task<TEntity> Replace(string id, TEntity newDocument);
         Task<bool> Delete(string id);
