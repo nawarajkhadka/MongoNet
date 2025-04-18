@@ -1,73 +1,106 @@
-# Introduction 
-TODO: MongoNet is a library project to facilitate normal crud operation with c# and mongodb
+# MongoSharper
 
-# Features
-1. Normal CRUD Operation
-2. Atlas search Operation
+**MongoSharper** is a lightweight C# library designed to simplify standard CRUD operations and integrate seamlessly with MongoDB, including support for advanced features like Atlas Search.
 
+---
 
-# Usage
+## 🚀 Features
 
-Install package.
-`Install-Package MongoSharper -version [version number]`
+- Easy-to-use, strongly typed repository pattern  
+- Standard CRUD operations  
+- Support for MongoDB Atlas Search  
+- Flexible filtering and projection  
+- Index creation utility  
 
-The usage is pretty simple, Just create an object of mongonetrepo and get going with all supported methods.
-1.Create a model inheriting the DocumentBase Class
-`public class MyClass:DocumentBase `
-`{`
-`public string Myproperty1 {get;set;}`
-`}`
+---
 
-2.Replace TEntity with your model
+## 📦 Installation
 
-3.Create a object of mongonetrepo
-`var mongonetRepo= new MongoNetRepo(myconnectionstring, mydatabasename)`
+You can install the MongoSharper package via NuGet:
 
-4.Call the methods as required passing your model
-`mongonetRepo.Method(parameter)`
+```bash
+Install-Package MongoSharper
+```
 
-Supported Methods:
+---
 
-1. **Create(TEntity document)**  
-   Creates a new document in the database.
+## 🧑‍💻 Usage
 
-2. **Task<TEntity> Replace(string id, TEntity newDocument)**  
-   Replaces an existing document with a new document.
+### 1. Define Your Model
 
-3. **Task<bool> Delete(string id)**  
-   Deletes a document from the database.
+Your model should inherit from `DocumentBase`:
 
-4. **Task<TEntity> Get(Expression<Func<TEntity, bool>> filterExpression)**  
-   Retrieves a document that matches the specified filter.
+```csharp
+public class MyClass : DocumentBase
+{
+    public string MyProperty1 { get; set; }
+}
+```
 
-5. **Task<TEntity> GetById(string id)**  
-   Retrieves a document by its identifier.
+### 2. Instantiate the Repository
 
-6. **Task<IEnumerable<TEntity>> Get()**  
-   Retrieves all documents from the database.
+Replace `TEntity` with your model class when using the generic repository:
 
-7. **Task<IEnumerable<TEntity>> GetTop(int limit)**  
-   Retrieves the top 'limit' documents from the database.
+```csharp
+var mongoRepo = new MongoNetRepo<MyClass>("your_connection_string", "your_database_name");
+```
 
-8. **IEnumerable<TProjected> FilterBy<TProjected>(Expression<Func<TEntity, bool>> filterExpression, Expression<Func<TEntity, TProjected>> projectionExpression)**  
-   Filters documents based on the specified criteria and projects them into a different type.
+### 3. Use the Available Methods
 
-9. **Task<bool> DeleteAllDocuments()**  
-   Deletes all documents from the database.
+You can now call any of the supported methods on the `mongoRepo` instance.
 
-10. **Task<IEnumerable<TEntity>> FilterBy(Expression<Func<TEntity, bool>> filterExpression)**  
-    Filters documents based on the specified criteria.
+---
 
-11. **IQueryable<TEntity> GetAsQuerable()**  
-    Retrieves documents as a queryable collection.
+## 🛠️ Supported Methods
 
-12. **IEnumerable<TEntity> GetTextSearchResults(string index, string searchField, string searchText)**  
-    Performs a text search on the specified field.
+### CRUD Operations
 
-13. **IEnumerable<TEntity> GetRegexSearchResults(string searchField, string regex, string index)**  
-    Performs a regex search on the specified field.
+- `void Create(TEntity document)`  
+  Inserts a new document.
 
-14. **void CreateIndex(TEntity entity, string fieldName, string indexName, bool unique = false)**  
-    Creates an index on a specified field of the entity.
+- `Task<TEntity> Replace(string id, TEntity newDocument)`  
+  Replaces an existing document.
 
-# Enjoy
+- `Task<bool> Delete(string id)`  
+  Deletes a document by ID.
+
+- `Task<TEntity> Get(Expression<Func<TEntity, bool>> filterExpression)`  
+  Retrieves a document by filter.
+
+- `Task<TEntity> GetById(string id)`  
+  Retrieves a document by ID.
+
+- `Task<IEnumerable<TEntity>> Get()`  
+  Retrieves all documents.
+
+- `Task<IEnumerable<TEntity>> GetTop(int limit)`  
+  Retrieves the top N documents.
+
+### Filtering & Projection
+
+- `IEnumerable<TProjected> FilterBy<TProjected>(Expression<Func<TEntity, bool>> filterExpression, Expression<Func<TEntity, TProjected>> projectionExpression)`  
+  Filters and projects data.
+
+- `Task<IEnumerable<TEntity>> FilterBy(Expression<Func<TEntity, bool>> filterExpression)`  
+  Filters data by criteria.
+
+- `IQueryable<TEntity> GetAsQueryable()`  
+  Gets a queryable collection.
+
+### Search Operations
+
+- `IEnumerable<TEntity> GetTextSearchResults(string index, string searchField, string searchText)`  
+  Performs full-text search.
+
+- `IEnumerable<TEntity> GetRegexSearchResults(string searchField, string regex, string index)`  
+  Performs regex-based search.
+
+### Utility
+
+- `void CreateIndex(TEntity entity, string fieldName, string indexName, bool unique = false)`  
+  Creates an index on a field.
+
+- `Task<bool> DeleteAllDocuments()`  
+  Deletes all documents from the collection.
+
+---
