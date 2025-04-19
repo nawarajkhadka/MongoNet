@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoNet.Enum;
 using MongoNet.Interfaces;
 using System.Linq.Expressions;
 
@@ -166,6 +167,72 @@ namespace MongoNet.Implementation
             return GetResultsFromPipelineDefinition(pipeline);
         }
 
+        /// <summary>
+        /// Auto delete document after certain time
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="value"></param>
+        /// <param name="timeUnit"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task<bool> AutoDelete(TEntity entity, int value, TimeUnit timeUnit)
+        {
+            var createdAtProp = typeof(TEntity).GetProperty("CreatedAt");
+            if (createdAtProp == null || createdAtProp.PropertyType != typeof(DateTime))
+                throw new Exception("TEntity must have a DateTime 'CreatedAt' property.");
+            
+            createdAtProp.SetValue(entity, DateTime.UtcNow);
+
+
+            var expireTime = GetExpireTime(value, timeUnit);
+            var expireSeconds = expireTime.TotalSeconds;
+
+
+            var indexes = await DbCollection.Indexes.ListAsync();
+            var indexList = await indexes.ToListAsync();
+            bool ttlIndexExists = indexList.Any(index =>
+            {
+                var key = index["key"]?.AsBsonDocument;
+                var expireAfter = index.Contains("expireAfterSeconds") ? index["expireAfterSeconds"].ToDouble() : (double?)null;
+                var name = index.Contains("name") ? index["name"].AsString : null;
+
+                return key != null &&
+                       key.ElementCount == 1 &&
+                       key.Names.Contains("CreatedAt") &&
+                       name == "TTL_CreatedAt" &&
+                       expireAfter.HasValue &&
+                       Math.Abs(expireAfter.Value - expireSeconds) < 1;
+            });
+
+            if (!ttlIndexExists)
+            {
+                var indexKeys = Builders<TEntity>.IndexKeys.Ascending("CreatedAt");
+                var indexOptions = new CreateIndexOptions
+                {
+                    Name = "TTL_CreatedAt",
+                    ExpireAfter = expireTime
+                };
+                var indexModel = new CreateIndexModel<TEntity>(indexKeys, indexOptions);
+                await DbCollection.Indexes.CreateOneAsync(indexModel);
+            }
+
+            return true;
+        }      
+
+
+        private TimeSpan GetExpireTime(int value, TimeUnit timeUnit)
+        {
+            return timeUnit switch
+            {
+                TimeUnit.Second => TimeSpan.FromSeconds(value),
+                TimeUnit.Minute => TimeSpan.FromMinutes(value),
+                TimeUnit.Day => TimeSpan.FromDays(value),
+                TimeUnit.Week => TimeSpan.FromDays(value * 7),
+                TimeUnit.Month => TimeSpan.FromDays(value * 30),
+                TimeUnit.Year => TimeSpan.FromDays(value * 365),
+                _ => throw new ArgumentOutOfRangeException(nameof(timeUnit), "Invalid time unit")
+            };
+        }
         private List<TEntity> GetResultsFromPipelineDefinition(PipelineDefinition<TEntity, BsonDocument> pipelineDefinition)
         {
             var pipeLineSearchResults = DbCollection.Aggregate(pipelineDefinition).ToList();

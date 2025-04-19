@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using MongoNet.Enum;
+using System.Linq.Expressions;
 
 
 namespace MongoNet.Interfaces
@@ -19,6 +20,7 @@ namespace MongoNet.Interfaces
         IQueryable<TEntity> GetAsQuerable();
         IEnumerable<TEntity> GetTextSearchResults(string index, string searchField, string searchText);
         IEnumerable<TEntity> GetRegexSearchResults(string searchField, string regex, string index);
+        Task<bool> AutoDelete(TEntity entity, int value, TimeUnit timeUnit);
 
     }
 }
